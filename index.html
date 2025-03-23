@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baccarat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="balance-bar">
+        <div class="balance-info">
+          <span>Balance: <span id="balance">1000000</span></span>
+          <span>Bet: <span id="current-bet">00</span></span>
+        </div>
+      </div>
+    
+      <!-- Bet Summary Bar -->
+      <div class="bet-summary-bar">
+        <span>Last Bet: <span id="last-bet"></span>00</span>
+        <span>Paid: <span id="amount-won"></span>00</span>
+      </div>
+
+
+  <!-- Logo Container -->
+  <div class="logo-container">
+    <div class="logo-wrapper">
+        <div class="card-label banker">Banker</div>
+        <img src="assets/logo/baccarat_logo_1250x719.png" alt="Baccarat Game Logo">
+        <div class="card-label player">Player</div>
+    </div>
+</div>
+
+  <!-- Game Container -->
+  <div class="game-container">
+    <!-- Player Area -->
+    <div class="cards-area">
+        <!-- Banker cards -->
+        <div class="card-stack banker-stack">
+            <div class="card-placeholder" id="banker-card-1"></div>
+            <div class="card-placeholder" id="banker-card-2"></div>
+            <div class="card-placeholder" id="banker-card-3"></div>
+        </div>
+        
+        <!-- Player cards -->
+        <div class="card-stack player-stack">
+            <div class="card-placeholder" id="player-card-1"></div>
+            <div class="card-placeholder" id="player-card-2"></div>
+            <div class="card-placeholder" id="player-card-3"></div>
+        </div>
+    </div>
+    <div class="betting-area">
+        <div class="betting-section" id="bet">
+            <img src="assets/pay.png" alt="Banker Bet" class="betting-spot" id="banker-spot">
+        </div>
+    </div>
+    <div class="chip-placeholder-container">
+        <div class="chip-placeholder" id="chip-placeholder-1"></div>
+        <div class="chip-placeholder" id="chip-placeholder-2"></div>
+        <div class="chip-placeholder" id="chip-placeholder-3"></div>
+    </div>
+
+    <div class="chip-rack">
+        <img src="assets/chips/black/black_topView.png" alt="Chip 1" class="chip" data-value="2000">
+        <img src="assets/chips/red/red_topView.png" alt="Chip 2" class="chip" data-value="500">
+        <img src="assets/chips/purple/purple_topView.png" alt="Chip 3" class="chip" data-value="100">
+        <img src="assets/chips/blue/blue_topView.png" alt="Chip 4" class="chip" data-value="25">
+        <img src="assets/chips/green/green_topView.png" alt="Chip 5" class="chip" data-value="5">
+        <img src="assets/chips/brown/brown_topView.png" alt="Chip 6" class="chip" data-value="1">
+      </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="baccarat.js"></script>
+</body>
+</html>
