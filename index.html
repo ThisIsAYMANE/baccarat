@@ -16,8 +16,8 @@
     
       <!-- Bet Summary Bar -->
       <div class="bet-summary-bar">
-        <span>Last Bet: <span id="last-bet"></span>00</span>
-        <span>Paid: <span id="amount-won"></span>00</span>
+        <span>Last Bet: <span id="last-bet">0</span></span>
+        <span>Paid: <span id="amount-won">0</span></span>
       </div>
 
 
@@ -68,6 +68,12 @@
         <img src="assets/chips/green/green_topView.png" alt="Chip 5" class="chip" data-value="5">
         <img src="assets/chips/brown/brown_topView.png" alt="Chip 6" class="chip" data-value="1">
       </div>
+      
+      <div class="action-buttons">
+        <img src="assets/deal_button.png" alt="Deal" class="action-button" id="deal-btn" onclick="dealCards()">
+        <img src="assets/double_bet_button.png" alt="Double Bet" class="action-button" id="double-bet-btn" onclick="doubleBet()">
+        <img src="assets/clear_bets_button.png" alt="Clear Bet" class="action-button" id="clear-bet-btn" onclick="resetCurrentBet()">
+    </div>
   </div>
 
   <script src="script.js"></script>

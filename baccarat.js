@@ -1,20 +1,23 @@
 // Initialize game variables
-let balance = 1000000; // Starting balance
-let currentBet = 0; // Current bet amount
-let lastBet = 0; // Last bet amount
-let amountWon = 0; // Amount won in the last round
-let bets = { tie: 0, banker: 0, player: 0 }; // Track bets for each placeholder
+// Initialize game variables
+let balance = 1000000;
+let currentBet = 0;
+let lastBet = 0;
+let amountWon = 0;
+let bets = { tie: 0, banker: 0, player: 0 };
+let game;
+let clearTimer = null;
 
 // Function to update the balance bar
 function updateBalanceBar() {
-    document.getElementById('balance').textContent = balance.toFixed(2);
-    document.getElementById('current-bet').textContent = currentBet.toFixed(2);
+    document.getElementById('balance').textContent = balance.toLocaleString();
+    document.getElementById('current-bet').textContent = currentBet.toLocaleString();
 }
 
 // Function to update the bet summary bar
 function updateBetSummaryBar() {
-    document.getElementById('last-bet').textContent = lastBet.toFixed(2);
-    document.getElementById('amount-won').textContent = amountWon.toFixed(2);
+    document.getElementById('last-bet').textContent = lastBet.toLocaleString();
+    document.getElementById('amount-won').textContent = amountWon.toLocaleString();
 }
 
 // Function to handle placing a bet
@@ -22,80 +25,207 @@ function placeBet(amount, placeholderType) {
     if (balance >= amount) {
         currentBet += amount;
         balance -= amount;
-        bets[placeholderType] += amount; // Track the bet for the specific placeholder
+        bets[placeholderType] += amount;
         updateBalanceBar();
+        return true;
     } else {
         alert('Insufficient balance!');
+        return false;
     }
 }
 
 // Function to reset the current bet
 function resetCurrentBet() {
+    // Reset only the current bet, not the last bet or amount won
     currentBet = 0;
-    bets = { tie: 0, banker: 0, player: 0 }; // Reset all bets
+    bets = { tie: 0, banker: 0, player: 0 };
+    
+    document.querySelectorAll('.chip-placeholder').forEach(placeholder => {
+        placeholder.innerHTML = '';
+    });
+    
     updateBalanceBar();
+}
+
+// Function to double all current bets
+function doubleBet() {
+    if (currentBet === 0) {
+        alert('No bets to double!');
+        return;
+    }
+    
+    if (balance < currentBet) {
+        alert('Insufficient balance to double bet!');
+        return;
+    }
+    
+    for (const [type, amount] of Object.entries(bets)) {
+        if (amount > 0) {
+            const success = placeBet(amount, type);
+            if (!success) return;
+            
+            const placeholderIndex = type === 'tie' ? 0 : type === 'banker' ? 1 : 2;
+            const placeholder = document.querySelectorAll('.chip-placeholder')[placeholderIndex];
+            const existingChip = placeholder.querySelector('.chip');
+            
+            if (existingChip) {
+                const newChip = existingChip.cloneNode(true);
+                placeholder.appendChild(newChip);
+            }
+        }
+    }
 }
 
 // Function to handle a win
 function handleWin(winAmount) {
-    balance += winAmount;
-    amountWon = winAmount;
+    // Store the values before any reset
     lastBet = currentBet;
-    resetCurrentBet();
+    amountWon = winAmount;
+    
+    // Update the UI first
     updateBetSummaryBar();
+    
+    // Then update balance
+    balance += winAmount;
+    updateBalanceBar();
+    
+    // Finally reset the current bet
+    resetCurrentBet();
 }
 
 // Function to handle a loss
 function handleLoss() {
-    amountWon = 0;
+    // Store the values before any reset
     lastBet = currentBet;
-    resetCurrentBet();
+    amountWon = 0;
+    
+    // Update the UI first
     updateBetSummaryBar();
+    
+    // Then reset the current bet
+    resetCurrentBet();
 }
 
-// Function to determine the payout based on the game result
+// Rest of your code remains exactly the same...
+// [Keep all other functions exactly as they were]
+// Function to determine the payout
 function calculatePayout(result) {
     let payout = 0;
     switch (result) {
         case 'Player wins!':
-            payout = bets.player * 1; // Player pays 1:1
+            payout = bets.player * 1;
             break;
         case 'Banker wins!':
-            payout = bets.banker * 0.95; // Banker pays 0.95:1 (5% commission)
+            payout = bets.banker * 0.95;
             break;
         case 'It\'s a tie!':
-            payout = bets.tie * 8; // Tie pays 8:1
+            payout = bets.tie * 8;
             break;
     }
-    return payout;
+    return Math.floor(payout);
 }
 
-// Get only the chips inside the chip-rack
+// Function to completely clear the table
+function clearTable() {
+    if (clearTimer) {
+        clearInterval(clearTimer);
+        clearTimer = null;
+    }
+
+    const countdownElement = document.getElementById('countdown-timer');
+    if (countdownElement) countdownElement.style.display = 'none';
+
+    document.querySelectorAll('.chip-placeholder').forEach(placeholder => {
+        placeholder.innerHTML = '';
+    });
+
+    ['player-card-1', 'player-card-2', 'player-card-3', 
+     'banker-card-1', 'banker-card-2', 'banker-card-3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+    });
+
+    const resultElement = document.getElementById('result');
+    if (resultElement) resultElement.textContent = '';
+}
+
+// Function to start the clear countdown
+function startClearCountdown(seconds = 7) {
+    const countdownElement = document.getElementById('countdown-timer');
+    if (!countdownElement) return;
+    
+   
+    let remaining = seconds;
+    
+    
+    clearTimer = setInterval(() => {
+        remaining--;
+      
+        
+        if (remaining <= 0) {
+            clearTable();
+        }
+    }, 1000);
+}
+
+// Function to deal cards and play a round
+function dealCards() {
+    // First check if any bets are placed (sum of all bets > 0)
+    const totalBet = Object.values(bets).reduce((sum, bet) => sum + bet, 0);
+    
+
+    
+    // Clear any existing timers and reset table
+    clearTable();
+    
+    if (!game) {
+        game = new BaccaratGame();
+    }
+    
+    const roundResult = game.playRound();
+    
+    // Display cards
+    displayCards(roundResult.playerHand, ['player-card-1', 'player-card-2', 'player-card-3']);
+    displayCards(roundResult.bankerHand, ['banker-card-1', 'banker-card-2', 'banker-card-3']);
+    
+    // Show result
+    const resultElement = document.getElementById('result');
+    if (resultElement) resultElement.textContent = roundResult.result;
+    
+    const payout = calculatePayout(roundResult.result);
+    if (payout > 0) {
+        handleWin(payout);
+    } else {
+        handleLoss();
+    }
+    
+    startClearCountdown(10);
+    game = new BaccaratGame();
+}
+
+// Drag and drop functionality
 const chips = document.querySelectorAll('.chip-rack .chip');
 const placeholders = document.querySelectorAll('.chip-placeholder');
 
-// Add event listeners for dragging and dropping
 chips.forEach(chip => {
-    // Make the element draggable
     chip.setAttribute('draggable', 'true');
     
     chip.addEventListener('dragstart', (event) => {
-        // Store both the image source and the chip value
         event.dataTransfer.setData('text/plain', JSON.stringify({
             src: event.target.src,
             value: event.target.dataset.value
         }));
-        event.target.style.opacity = '0.5'; // Make the chip semi-transparent while dragging
+        event.target.style.opacity = '0.5';
     });
 
     chip.addEventListener('dragend', (event) => {
-        event.target.style.opacity = '1'; // Reset the opacity after dragging
+        event.target.style.opacity = '1';
     });
 });
 
 placeholders.forEach((placeholder, index) => {
     placeholder.addEventListener('dragover', (event) => {
-        event.preventDefault(); // Necessary to allow dropping
+        event.preventDefault();
     });
 
     placeholder.addEventListener('drop', (event) => {
@@ -107,20 +237,16 @@ placeholders.forEach((placeholder, index) => {
             newChip.src = chipData.src;
             newChip.className = 'chip';
             newChip.dataset.value = chipData.value;
-            newChip.width = 50; // Adjust the size of the dropped chip
+            newChip.width = 50;
             newChip.height = 50;
 
-            // Append the chip to the placeholder
-            placeholder.innerHTML = ''; // Clear any previous chip
-            placeholder.appendChild(newChip); // Add the new chip to the placeholder
+            placeholder.innerHTML = '';
+            placeholder.appendChild(newChip);
 
-            // Update the bet amount and balance
             const chipValue = parseInt(chipData.value);
-            const placeholderType = ['tie', 'banker', 'player'][index]; // Tie, Banker, Player
+            const placeholderType = ['tie', 'banker', 'player'][index];
             placeBet(chipValue, placeholderType);
 
-            // Log the placeholder type and chip value
-            console.log(`Chip placed on ${placeholderType} with value: ${chipValue}`);
         } catch (e) {
             console.error('Error processing dropped data:', e);
         }
@@ -140,89 +266,85 @@ function getCardImagePath(card) {
     return `assets/svg-cards/${value}_of_${card.suit}.svg`;
 }
 
-// Function to inject CSS styles into the DOM
+// Function to inject CSS styles
 function injectStyles() {
     const style = document.createElement('style');
     style.textContent = `
-        /* Card Placeholder Styles */
         .card-placeholder {
-            width: 80px; /* Match image width */
-            height: 90px; /* Match image height */
+            width: 80px;
+            height: 90px;
             border-radius: 8px;
             transition: all 0.3s ease;
         }
 
-        /* Card Animation */
         @keyframes easeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card-img {
-            width: 80px; /* Set width */
-            height: 90px; /* Set height */
-            animation: easeIn 0.5s ease-in-out; /* Apply animation */
+            width: 80px;
+            height: 90px;
+            animation: easeIn 0.5s ease-in-out;
+        }
+        
+        #countdown-timer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none;
+            font-size: 1.5rem;
+        }
+        
+        .chip-placeholder {
+            transition: opacity 0.3s ease;
         }
     `;
     document.head.appendChild(style);
 }
 
-// Function to display cards with a delay and animation
+// Function to display cards with animation
 function displayCards(hand, placeholderIds) {
     hand.forEach((card, index) => {
         setTimeout(() => {
             const placeholder = document.getElementById(placeholderIds[index]);
             if (placeholder) {
-                // Create an image element
                 const img = document.createElement('img');
                 img.src = getCardImagePath(card);
                 img.classList.add('card-img');
-
-                // Set the size of the image
-                img.width = 80; // Set width in pixels
-                img.height = 90; // Set height in pixels
-
-                // Append the image to the placeholder
-                placeholder.innerHTML = ''; // Clear previous content
+                img.width = 80;
+                img.height = 90;
+                placeholder.innerHTML = '';
                 placeholder.appendChild(img);
             }
-        }, index * 500); // Delay each card by 500ms
+        }, index * 500);
     });
 }
 
 // Initialize the game
 function initGame() {
-    // Inject CSS styles
     injectStyles();
 
-    // Create and shuffle the deck
-    const game = new BaccaratGame();
-
-    // Automatically deal cards when the page loads
-    const roundResult = game.playRound();
-
-    // Display player cards
-    displayCards(roundResult.playerHand, ['player-card-1', 'player-card-2', 'player-card-3']);
-
-    // Display banker cards
-    displayCards(roundResult.bankerHand, ['banker-card-1', 'banker-card-2', 'banker-card-3']);
-
-    // Display result
-    document.getElementById('result').textContent = roundResult.result;
-
-    // Calculate payout and update balance
-    const payout = calculatePayout(roundResult.result);
-    if (payout > 0) {
-        handleWin(payout);
-    } else {
-        handleLoss();
+    if (!document.getElementById('countdown-timer')) {
+        const countdown = document.createElement('div');
+        countdown.id = 'countdown-timer';
+        document.body.appendChild(countdown);
     }
+
+    game = new BaccaratGame();
+
+    document.getElementById('deal-btn').addEventListener('click', dealCards);
+    document.getElementById('double-bet-btn').addEventListener('click', doubleBet);
+    document.getElementById('clear-bet-btn').addEventListener('click', resetCurrentBet);
+
+    updateBalanceBar();
+    updateBetSummaryBar();
 }
 
 // Baccarat Game Class
@@ -232,7 +354,6 @@ class BaccaratGame {
         this.shuffleDeck();
     }
 
-    // Create a standard deck of 52 cards
     createDeck() {
         const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
@@ -245,7 +366,6 @@ class BaccaratGame {
         return deck;
     }
 
-    // Shuffle the deck using Fisher-Yates algorithm
     shuffleDeck() {
         for (let i = this.deck.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -253,7 +373,6 @@ class BaccaratGame {
         }
     }
 
-    // Get the value of a card in Baccarat
     getCardValue(card) {
         if (['J', 'Q', 'K', '10'].includes(card.value)) {
             return 0;
@@ -264,28 +383,23 @@ class BaccaratGame {
         }
     }
 
-    // Calculate the total value of a hand
     calculateHandValue(hand) {
         let total = hand.reduce((sum, card) => sum + this.getCardValue(card), 0);
-        return total % 10; // Only the last digit counts
+        return total % 10;
     }
 
-    // Deal a card from the deck
     dealCard() {
         if (this.deck.length === 0) {
-            console.warn('Deck is empty! Reshuffling...');
-            this.deck = this.createDeck(); // Reshuffle if deck is empty
+            this.deck = this.createDeck();
             this.shuffleDeck();
         }
         return this.deck.pop();
     }
 
-    // Determine if a third card should be drawn
     shouldDrawThirdCard(handValue) {
         return handValue <= 5;
     }
 
-    // Play a round of Baccarat
     playRound() {
         const playerHand = [this.dealCard(), this.dealCard()];
         const bankerHand = [this.dealCard(), this.dealCard()];
@@ -293,13 +407,11 @@ class BaccaratGame {
         let playerValue = this.calculateHandValue(playerHand);
         let bankerValue = this.calculateHandValue(bankerHand);
 
-        // Player draws a third card if necessary
         if (this.shouldDrawThirdCard(playerValue)) {
             playerHand.push(this.dealCard());
             playerValue = this.calculateHandValue(playerHand);
         }
 
-        // Banker draws a third card based on rules
         if (this.shouldDrawThirdCard(bankerValue)) {
             bankerHand.push(this.dealCard());
             bankerValue = this.calculateHandValue(bankerHand);
