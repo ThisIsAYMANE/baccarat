@@ -23,10 +23,18 @@ function updateBetSummaryBar() {
 // Function to handle placing a bet
 function placeBet(amount, placeholderType) {
     if (balance >= amount) {
+        // If you want to track total bet for the round
+        if (currentBet === 0) {
+            lastBet = amount;
+        } else {
+            lastBet += amount;
+        }
+        
         currentBet += amount;
         balance -= amount;
         bets[placeholderType] += amount;
         updateBalanceBar();
+        updateBetSummaryBar();
         return true;
     } else {
         alert('Insufficient balance!');
