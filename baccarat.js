@@ -18,6 +18,7 @@ function updateBetSummaryBar() {
     document.getElementById('last-bet').textContent = lastBet.toLocaleString();
     document.getElementById('amount-won').textContent = amountWon.toLocaleString();
 }
+/////////
 
 // Function to handle placing a bet
 function placeBet(amount, placeholderType) {
