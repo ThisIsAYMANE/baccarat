@@ -1,5 +1,4 @@
 // Initialize game variables
-// Initialize game variables
 let balance = 1000000;
 let currentBet = 0;
 let lastBet = 0;
@@ -23,10 +22,11 @@ function updateBetSummaryBar() {
 // Function to handle placing a bet
 function placeBet(amount, placeholderType) {
     if (balance >= amount) {
-        // If you want to track total bet for the round
+        // If this is the first bet of the round, reset lastBet
         if (currentBet === 0) {
             lastBet = amount;
         } else {
+            // If not the first bet, add to lastBet
             lastBet += amount;
         }
         
@@ -44,7 +44,7 @@ function placeBet(amount, placeholderType) {
 
 // Function to reset the current bet
 function resetCurrentBet() {
-    // Reset only the current bet, not the last bet or amount won
+    // Reset only the current bet, keeping lastBet intact
     currentBet = 0;
     bets = { tie: 0, banker: 0, player: 0 };
     
@@ -53,6 +53,13 @@ function resetCurrentBet() {
     });
     
     updateBalanceBar();
+}
+
+// Optional: Function to reset last bet manually if needed
+function resetLastBet() {
+    lastBet = 0;
+    amountWon = 0;
+    updateBetSummaryBar();
 }
 
 // Function to double all current bets
@@ -84,53 +91,33 @@ function doubleBet() {
     }
 }
 
-// Function to handle a win
-function handleWin(winAmount) {
-    // Store the values before any reset
-    lastBet = currentBet;
-    amountWon = winAmount;
+// Function to handle win/loss outcome
+function handleOutcome(payout) {
+    amountWon = payout;
+    balance += payout;
     
-    // Update the UI first
+    // Update the UI
     updateBetSummaryBar();
-    
-    // Then update balance
-    balance += winAmount;
     updateBalanceBar();
-    
-    // Finally reset the current bet
-    resetCurrentBet();
 }
 
-// Function to handle a loss
-function handleLoss() {
-    // Store the values before any reset
-    lastBet = currentBet;
-    amountWon = 0;
-    
-    // Update the UI first
-    updateBetSummaryBar();
-    
-    // Then reset the current bet
-    resetCurrentBet();
-}
-
-// Rest of your code remains exactly the same...
-// [Keep all other functions exactly as they were]
 // Function to determine the payout
+// Old version returned just winnings (always positive)
+// New version returns NET outcome (winnings minus bet amount)
 function calculatePayout(result) {
-    let payout = 0;
+    let winnings = 0;
     switch (result) {
         case 'Player wins!':
-            payout = bets.player * 1;
+            winnings = bets.player * 2; // Returns bet*2 (original + winnings)
             break;
         case 'Banker wins!':
-            payout = bets.banker * 0.95;
+            winnings = bets.banker * 1.95; // Returns bet*1.95
             break;
         case 'It\'s a tie!':
-            payout = bets.tie * 8;
+            winnings = bets.tie * 9; // Returns bet*9
             break;
     }
-    return Math.floor(payout);
+    return Math.floor(winnings - currentBet); // Now returns net change
 }
 
 // Function to completely clear the table
@@ -162,14 +149,11 @@ function startClearCountdown(seconds = 7) {
     const countdownElement = document.getElementById('countdown-timer');
     if (!countdownElement) return;
     
-   
     let remaining = seconds;
-    
     
     clearTimer = setInterval(() => {
         remaining--;
       
-        
         if (remaining <= 0) {
             clearTable();
         }
@@ -178,11 +162,6 @@ function startClearCountdown(seconds = 7) {
 
 // Function to deal cards and play a round
 function dealCards() {
-    // First check if any bets are placed (sum of all bets > 0)
-    const totalBet = Object.values(bets).reduce((sum, bet) => sum + bet, 0);
-    
-
-    
     // Clear any existing timers and reset table
     clearTable();
     
@@ -201,14 +180,13 @@ function dealCards() {
     if (resultElement) resultElement.textContent = roundResult.result;
     
     const payout = calculatePayout(roundResult.result);
-    if (payout > 0) {
-        handleWin(payout);
-    } else {
-        handleLoss();
-    }
+    handleOutcome(payout);
     
     startClearCountdown(10);
     game = new BaccaratGame();
+    
+    // Reset for the next round
+    resetCurrentBet();
 }
 
 // Drag and drop functionality
