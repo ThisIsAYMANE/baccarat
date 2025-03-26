@@ -18,7 +18,6 @@ function updateBetSummaryBar() {
     document.getElementById('last-bet').textContent = lastBet.toLocaleString();
     document.getElementById('amount-won').textContent = amountWon.toLocaleString();
 }
-/////////
 
 // Function to handle placing a bet
 function placeBet(amount, placeholderType) {
@@ -36,6 +35,27 @@ function placeBet(amount, placeholderType) {
         bets[placeholderType] += amount;
         updateBalanceBar();
         updateBetSummaryBar();
+        
+        // Update the chip display
+        const placeholderIndex = placeholderType === 'tie' ? 0 : placeholderType === 'banker' ? 1 : 2;
+        const placeholder = document.querySelectorAll('.chip-placeholder')[placeholderIndex];
+        const chipValue = amount;
+        const chipSrc = document.querySelector(`.chip[data-value="${chipValue}"]`).src;
+        
+        // Clear and create a new chip stack
+        placeholder.innerHTML = '';
+        const chipStack = document.createElement('div');
+        chipStack.className = 'chip-stack';
+        
+        const newChip = document.createElement('img');
+        newChip.src = chipSrc;
+        newChip.className = 'chip stacked-chip';
+        newChip.dataset.value = chipValue;
+        newChip.width = 50;
+        newChip.height = 50;
+        chipStack.appendChild(newChip);
+        placeholder.appendChild(chipStack);
+        
         return true;
     } else {
         alert('Insufficient balance!');
@@ -45,7 +65,7 @@ function placeBet(amount, placeholderType) {
 
 // Function to reset the current bet
 function resetCurrentBet() {
-    // Reset only the current bet, keeping lastBet intact
+    balance += currentBet; // Return the bet amount to balance
     currentBet = 0;
     bets = { tie: 0, banker: 0, player: 0 };
     
@@ -54,13 +74,6 @@ function resetCurrentBet() {
     });
     
     updateBalanceBar();
-}
-
-// Optional: Function to reset last bet manually if needed
-function resetLastBet() {
-    lastBet = 0;
-    amountWon = 0;
-    updateBetSummaryBar();
 }
 
 // Function to double all current bets
@@ -82,15 +95,105 @@ function doubleBet() {
             
             const placeholderIndex = type === 'tie' ? 0 : type === 'banker' ? 1 : 2;
             const placeholder = document.querySelectorAll('.chip-placeholder')[placeholderIndex];
-            const existingChip = placeholder.querySelector('.chip');
+            const chipStack = placeholder.querySelector('.chip-stack');
             
-            if (existingChip) {
-                const newChip = existingChip.cloneNode(true);
-                placeholder.appendChild(newChip);
-            }
+            // Get the existing chip to clone
+            const existingChip = chipStack.querySelector('.chip');
+            const chipValue = existingChip.dataset.value;
+            const chipSrc = existingChip.src;
+            
+            // Add a second chip to the stack
+            const newChip = document.createElement('img');
+            newChip.src = chipSrc;
+            newChip.className = 'chip stacked-chip';
+            newChip.dataset.value = chipValue;
+            newChip.width = 50;
+            newChip.height = 50;
+            newChip.style.position = 'absolute';
+            newChip.style.top = '10px';
+            chipStack.appendChild(newChip);
         }
     }
 }
+
+// Rest of your existing code remains the same...
+// [Keep all other functions exactly as they were in your original code]
+// Only the functions shown above were modified for the chip stacking feature
+
+// Update the injectStyles function to include chip stacking styles
+function injectStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .card-placeholder {
+            width: 80px;
+            height: 90px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes easeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-img {
+            width: 80px;
+            height: 90px;
+            animation: easeIn 0.5s ease-in-out;
+        }
+        
+        #countdown-timer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none;
+            font-size: 1.5rem;
+        }
+        
+        .chip-placeholder {
+            transition: opacity 0.3s ease;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chip-stack {
+            position: relative;
+            height: 60px;
+            width: 50px;
+        }
+        
+        .stacked-chip {
+            position: absolute;
+            left: 0;
+            transition: transform 0.2s ease;
+        }
+        
+        .stacked-chip:first-child {
+            top: 0;
+            z-index: 2;
+        }
+        
+        .stacked-chip:last-child:not(:first-child) {
+            top: 10px;
+            z-index: 1;
+        }
+        
+        .chip-stack:hover .stacked-chip:first-child {
+            transform: translateY(-5px);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// [Rest of your original code remains unchanged]
 
 // Function to handle win/loss outcome
 function handleOutcome(payout) {
