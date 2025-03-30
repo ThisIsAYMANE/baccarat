@@ -118,7 +118,7 @@ function doubleBet() {
 
 // Rest of your existing code remains the same...
 // [Keep all other functions exactly as they were in your original code]
-// Only the functions shown above were modified for the chip stacking feature
+// Only the functions shown above were modified for the chip stacking feature kkkkkkkkk
 
 // Update the injectStyles function to include chip stacking styles
 function injectStyles() {
