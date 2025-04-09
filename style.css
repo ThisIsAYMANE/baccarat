@@ -11,33 +11,74 @@ body {
     align-items: center;
     font-family: Arial, sans-serif;
     color: #fff;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Responsive Container */
+.game-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1680px; /* Match the width of your background image */
+    min-height: 100vh;
+    margin: 0 auto;
 }
 
 /* Logo Container */
 .logo-container {
-    position: fixed; /* Keeps it fixed on the screen */
-    top: 100px; /* Adjusts vertical position */
-    left: 50%; /* Centers it horizontally */
-    transform: translateX(-50%); /* Ensures perfect centering */
+    position: absolute;
+    top: 10vh; /* Use viewport height instead of fixed pixels */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%; /* Use percentage width */
+    max-width: 300px; /* Maximum width */
     display: flex;
     justify-content: center;
     align-items: flex-start;
 }
 
 .logo-container img {
-    max-width: 300px;
+    width: 100%;
     height: auto;
     opacity: 0.5;
 }
 
+.logo-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Card Labels */
+.card-label {
+    position: absolute;
+    width: 20%; /* Percentage of parent container */
+    padding: 5px;
+    border: 0.5px solid white;
+    text-align: center;
+    font-size: 14px;
+    color: white;
+    border-radius: 5px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.banker {
+    border-color: white;
+    top: 25%;
+    left: -15%;
+}
+
+.player {
+    border-color: white;
+    top: 25%;
+    right: -15%;
+}
 
 /* Chip Rack */
 .chip-rack {
-    position: fixed;
-    bottom: 20px;
-    left: 100px;
+    position: absolute;
+    bottom: 5vh;
+    left: 5%;
     display: flex;
-    gap: 10px;
+    gap: 1vw; /* Viewport-relative spacing */
     padding: 10px;
     z-index: 1000;
 }
@@ -50,114 +91,77 @@ body {
     transition: transform 0.3s ease;
 }
 
+@media (max-width: 768px) {
+    .chip {
+        width: 25px;
+        height: 25px;
+    }
+}
+
 .chip:hover {
     transform: translateY(-5px);
 }
 
 /* Game Container */
 .game-container {
-    text-align: center;
-    margin-top: 20px;
-}
-.card-label {
-    position: absolute;
-    width: 60px; /* Adjust size */
-    padding: 5px;
-    border: 0.5px solid white; /* White border */
-    text-align: center;
-    font-size: 14px;
-    
-    color: white;
-    border-radius: 5px;
-    font-family: 'Times New Roman', Times, serif;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.banker {
-    border-color: white; /* Red border for Banker */
-    top: 25%; /* Adjust vertical position */
-    left: -10%; /* Adjust horizontal position */
-}
-
-.player {
-    border-color: white; /* Blue border for Player */
-    top: 25%; /* Adjust vertical position */
-    right: -10%; /* Adjust horizontal position */
-}
-
+/* Betting Spot */
+/* Betting Spot */
 .betting-spot {
-    width: 600px;
-    height: 350px; /* Adjust the height of the area where chips are placed */
+    width: 40vw; /* Viewport-relative width */
+    max-width: 600px;
+    height: 45vh; /* Increased from 30vh to 40vh */
+    max-height: 600px; /* Increased from 350px to 450px */
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    top:230px ;
+    margin-top: 35vh;
     opacity: 0.6;
 }
 
-/* Chip Placement Area (placeholders) */
-
-
-/* Each individual placeholder */
-/* Chip Placeholder Container */
-.chip-placeholder-container {
-    position: fixed;
-    top: 60%; /* Moved down from 50% to 60% */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    align-items: center;
-    z-index: 1000;
+/* For medium screens, ensure the betting area remains prominent */
+@media (max-width: 768px) {
+    .betting-spot {
+        height: 35vh; /* Still larger than the original */
+        max-height: 400px;
+    }
 }
 
-/* Each individual placeholder */
-.chip-placeholder {
-    position: fixed;
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    opacity: 0.8;
+/* For small screens, adjust but keep it visible */
+@media (max-width: 480px) {
+    .betting-spot {
+        height: 30vh;
+        max-height: 350px;
+    }
 }
 
-#chip-placeholder-1 {
-    top: calc(60% - 80px); /* Moved further up by increasing the subtraction */
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-#chip-placeholder-2 {
-    top: 60%; /* Keep the middle one as is */
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-#chip-placeholder-3 {
-    top: calc(60% + 80px); /* Moved further down by increasing the addition */
-    left: 50%;
-    transform: translateX(-50%);
-}
+/* Cards Area */
 .cards-area {
-    position: fixed;
-    top: 25%;
+    position: absolute;
+    top: 25vh;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     justify-content: center;
-    gap: 180px; /* Increased from 400px to 600px */
+    gap: 15vw; /* Viewport-relative spacing */
+    max-width: 80%;
+    width: 100%;
     z-index: 900;
 }
 
 /* Each card stack (Banker and Player) */
 .card-stack {
     position: relative;
-    width: 100px;
-    height: 150px;
+    width: 80px;
+    height: 120px;
 }
 
 /* Card Placeholders */
@@ -169,33 +173,155 @@ body {
     transition: all 0.3s ease;
 }
 
+.card-img {
+    width: 100%;
+    height: 100%;
+    animation: easeIn 0.5s ease-in-out;
+    object-fit: contain;
+}
+
 /* Banker stack (left) */
 .banker-stack {
-    order: 0; /* Ensures banker is on the left */
+    order: 0;
 }
 
 .banker-stack .card-placeholder {
-    left: 0; /* Align to the left edge of the stack */
+    left: 0;
 }
 
 /* Player stack (right) */
 .player-stack {
-    order: 1; /* Ensures player is on the right */
+    order: 1;
 }
 
 .player-stack .card-placeholder {
-    right: 0; /* Align to the right edge of the stack */
+    right: 0;
 }
 
 /* Stacking positions for banker cards */
 #banker-card-1 { top: 0; left: 0; z-index: 3; }
-#banker-card-2 { top: 20px; left: 10px; z-index: 2; }
-#banker-card-3 { top: 40px; left: 20px; z-index: 1; }
+#banker-card-2 { top: 15%; left: 10%; z-index: 2; }
+#banker-card-3 { top: 30%; left: 20%; z-index: 1; }
 
 /* Stacking positions for player cards */
 #player-card-1 { top: 0; right: 0; z-index: 3; }
-#player-card-2 { top: 20px; right: 10px; z-index: 2; }
-#player-card-3 { top: 40px; right: 20px; z-index: 1; }
+#player-card-2 { top: 15%; right: 10%; z-index: 2; }
+#player-card-3 { top: 30%; right: 20%; z-index: 1; }
+
+/* Enhanced responsive adjustments for cards */
+@media (max-width: 1200px) {
+    .card-stack {
+        width: 70px;
+        height: 105px;
+    }
+    
+    .card-placeholder {
+        width: 70px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 992px) {
+    .card-stack {
+        width: 60px;
+        height: 90px;
+    }
+    
+    .card-placeholder {
+        width: 60px;
+        height: 85px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-stack {
+        width: 50px;
+        height: 75px;
+    }
+    
+    .card-placeholder {
+        width: 50px;
+        height: 70px;
+    }
+    
+    .cards-area {
+        gap: 10vw; /* Reduce gap on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .card-stack {
+        width: 40px;
+        height: 60px;
+    }
+    
+    .card-placeholder {
+        width: 40px;
+        height: 55px;
+    }
+    
+    .cards-area {
+        gap: 5vw; /* Further reduce gap on very small screens */
+    }
+}
+
+/* Animation for cards */
+@keyframes easeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Chip Placeholder Container */
+.chip-placeholder-container {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 4vh; /* Viewport-relative spacing */
+    align-items: center;
+    z-index: 1000;
+    width: 100%;
+}
+
+/* Each individual placeholder */
+.chip-placeholder {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .chip-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+#chip-placeholder-1 {
+    top: -10vh;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#chip-placeholder-2 {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#chip-placeholder-3 {
+    top: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+}
 
 /* Balance Bar */
 .balance-bar {
@@ -203,69 +329,96 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 12px;
     background-color: #030405;
     color: white;
-    padding: 10px;
+    padding: 10px 0;
     text-align: center;
-    font-size: 18px;
+    font-size: clamp(14px, 2vw, 18px); /* Responsive font size */
     z-index: 1000;
-    
-
 }
 
 .balance-info {
     display: flex;
-    justify-content: center; /* Center the items */
-    gap: 60px; /* Reduce the gap between balance and bet */
+    justify-content: center;
+    gap: 5vw; /* Viewport-relative spacing */
 }
 
 /* Bet Summary Bar */
 .bet-summary-bar {
     position: fixed;
-    top: 32px; /* Adjust based on the height of the balance bar */
-    left: 50%; /* Move to the horizontal center */
-    transform: translateX(-50%); /* Adjust to center perfectly */
-    width: 50%; /* Set width to 50% of the page */
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    min-width: 300px;
     background-color: #030303;
     color: white;
-    padding: 10px;
+    padding: 10px 0;
     text-align: center;
-    font-size: 16px;
+    font-size: clamp(12px, 1.8vw, 16px); /* Responsive font size */
     z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-
-    /* Add border radius to the bottom */
-    border-bottom-left-radius: 10px; /* Adjust radius as needed */
-    border-bottom-right-radius: 10px; /* Adjust radius as needed */
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     opacity: 0.7;
-    /* Add white border to the sides and bottom */
-
 }
 
 .bet-summary-bar span {
-    margin: 0 20px;
+    margin: 0 2vw;
 }
 
+@media (max-width: 768px) {
+    .bet-summary-bar {
+        width: 90%;
+    }
+    .bet-summary-bar span {
+        margin: 0 10px;
+    }
+}
 
+/* Action Buttons */
 .action-buttons {
-    position: fixed;
-    bottom: 50px;    
-    right: 250px;
+    position: absolute;
+    bottom: 5vh;
+    right: 5%;
     display: flex;
-    gap: 15px; /* Space between buttons */
-    z-index: 1100; /* Ensure it's above other elements */
+    gap: 15px;
+    z-index: 1100;
 }
 
 .action-button {
-    width: 70px; /* Adjust based on your button image sizes */
-    height: 70px; /* Adjust based on your button image sizes */
+    width: 70px;
+    height: 70px;
     cursor: pointer;
     transition: transform 0.2s ease;
 }
 
+@media (max-width: 768px) {
+    .action-button {
+        width: 50px;
+        height: 50px;
+    }
+}
+
 .action-button:hover {
-    transform: scale(1.05); /* Slight enlarge on hover */
+    transform: scale(1.05);
     opacity: 0.9;
+}
+
+/* Media queries for smaller screens */
+@media (max-width: 480px) {
+    .chip {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .action-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .card-placeholder {
+        width: 50px;
+        height: 70px;
+    }
 }
